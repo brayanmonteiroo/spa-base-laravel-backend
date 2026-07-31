@@ -20,7 +20,7 @@ final class UserController extends Controller
     {
         $this->authorize('viewAny', User::class);
 
-        $perPage = min(max($request->integer('per_page', 15), 1), 100);
+        $perPage = min(max($request->integer('per_page', 10), 1), 100);
 
         $users = User::query()
             ->orderBy('name')
