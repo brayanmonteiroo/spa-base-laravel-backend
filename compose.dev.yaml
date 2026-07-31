@@ -1,0 +1,136 @@
+name: spa-base-laravel
+
+services:
+  web:
+    container_name: spa-base-laravel-web
+    image: nginx:latest
+    volumes:
+      - ./:/var/www
+      - ./docker/development/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "${NGINX_PORT:-8097}:80"
+    environment:
+      - NGINX_HOST=localhost
+    networks:
+      - laravel-development
+    depends_on:
+      php-fpm:
+        condition: service_started
+    restart: unless-stopped
+
+  php-fpm:
+    container_name: spa-base-laravel-php-fpm
+    build:
+      context: .
+      dockerfile: ./docker/common/php-fpm/Dockerfile
+      target: development
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+        XDEBUG_ENABLED: ${XDEBUG_ENABLED:-true}
+        XDEBUG_MODE: develop,coverage,debug,profile
+        XDEBUG_HOST: ${XDEBUG_HOST:-host.docker.internal}
+        XDEBUG_IDE_KEY: ${XDEBUG_IDE_KEY:-DOCKER}
+        XDEBUG_LOG: /dev/stdout
+        XDEBUG_LOG_LEVEL: 0
+    env_file:
+      - .env
+    user: "${UID:-1000}:${GID:-1000}"
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./:/var/www
+    networks:
+      - laravel-development
+    depends_on:
+      postgres:
+        condition: service_started
+      redis:
+        condition: service_started
+
+  workspace:
+    container_name: spa-base-laravel-workspace
+    build:
+      context: .
+      dockerfile: ./docker/development/workspace/Dockerfile
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+        XDEBUG_ENABLED: ${XDEBUG_ENABLED:-true}
+        XDEBUG_MODE: develop,coverage,debug,profile
+        XDEBUG_HOST: ${XDEBUG_HOST:-host.docker.internal}
+        XDEBUG_IDE_KEY: ${XDEBUG_IDE_KEY:-DOCKER}
+        XDEBUG_LOG: /dev/stdout
+        XDEBUG_LOG_LEVEL: 0
+    tty: true
+    stdin_open: true
+    env_file:
+      - .env
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./:/var/www
+    networks:
+      - laravel-development
+
+  postgres:
+    container_name: spa-base-laravel-postgres
+    image: postgres:18
+    ports:
+      - "${POSTGRES_PORT:-5437}:5432"
+    environment:
+      POSTGRES_DB: ${POSTGRES_DATABASE:-spa_base}
+      POSTGRES_USER: ${POSTGRES_USERNAME:-laravel}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-secret}
+    volumes:
+      - postgres-data:/var/lib/postgresql
+    networks:
+      - laravel-development
+    healthcheck:
+      test: ["CMD", "pg_isready", "-U", "${POSTGRES_USERNAME:-laravel}"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    container_name: spa-base-laravel-redis
+    image: redis:alpine
+    networks:
+      - laravel-development
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+
+  horizon:
+    container_name: spa-base-laravel-horizon
+    build:
+      context: .
+      dockerfile: ./docker/common/php-fpm/Dockerfile
+      target: development
+      args:
+        UID: ${UID:-1000}
+        GID: ${GID:-1000}
+        XDEBUG_ENABLED: "false"
+    entrypoint: []
+    command: php artisan horizon
+    env_file:
+      - .env
+    user: "${UID:-1000}:${GID:-1000}"
+    volumes:
+      - ./:/var/www
+    networks:
+      - laravel-development
+    depends_on:
+      redis:
+        condition: service_started
+      postgres:
+        condition: service_started
+    restart: unless-stopped
+
+networks:
+  laravel-development:
+
+volumes:
+  postgres-data:
