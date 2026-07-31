@@ -60,10 +60,10 @@ docker compose -f compose.dev.yaml exec workspace composer install
 docker compose -f compose.dev.yaml exec workspace php artisan key:generate
 ```
 
-### 5. Migrations
+### 5. Migrations + seeder
 
 ```bash
-docker compose -f compose.dev.yaml exec workspace php artisan migrate
+docker compose -f compose.dev.yaml exec workspace php artisan migrate --seed
 ```
 
 ### 6. Verificar
@@ -109,13 +109,53 @@ docker/
 
 ## Stack
 
-- Laravel + Sanctum (API)
+- Laravel + Sanctum (SPA: cookies de sessão + CSRF)
 - PostgreSQL 18
 - Redis (cache, fila, Horizon)
 - Laravel Horizon
 - Xdebug no `php-fpm` / `workspace` (opcional via `.env`)
 
+## Autenticação Sanctum SPA
+
+Fluxo:
+
+1. `GET /sanctum/csrf-cookie`
+2. `POST /api/login` (guard `web`, sessão)
+3. Rotas protegidas com `auth:sanctum`
+
+Endpoints principais:
+
+| Método | Rota | Auth |
+|--------|------|------|
+| POST | `/api/login` | público |
+| POST | `/api/logout` | sanctum |
+| GET | `/api/user` | sanctum |
+| POST | `/api/forgot-password` | público |
+| POST | `/api/reset-password` | público |
+| * | `/api/admin/users` | sanctum (CRUD) |
+
+Não há registro público.
+
+### Admin (seeder)
+
+```bash
+docker compose -f compose.dev.yaml exec workspace php artisan db:seed
+```
+
+Credenciais padrão:
+
+- E-mail: `admin@spa-base.test`
+- Senha: `password`
+
+### Testes
+
+```bash
+docker compose -f compose.dev.yaml exec workspace php artisan test
+```
+
 ## Observações
 
-- Autenticação SPA completa fica para um plano futuro; Sanctum/CORS já estão preparados para o front em `:9020`.
+- `FRONTEND_URL` e `SANCTUM_STATEFUL_DOMAINS` devem bater com o Quasar (`localhost:9020`).
+- Links de reset de senha apontam para o frontend (`/reset-password`).
+- Mail em Docker usa `MAIL_MAILER=log` (sem SMTP real).
 - Não versionar `.env` (já está no `.gitignore`).
