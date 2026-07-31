@@ -184,6 +184,7 @@ Não use `migrate:fresh` no `.env` de desenvolvimento achando que está “só t
 
 ## Observações
 
+- Logs: canal `daily` (`LOG_STACK=daily`) com retenção de **30 dias** (`LOG_DAILY_DAYS=30`) — arquivos em `storage/logs/laravel-YYYY-MM-DD.log`.
 - `FRONTEND_URL` e `SANCTUM_STATEFUL_DOMAINS` devem bater com o Quasar (`localhost:9020`).
 - Links de reset de senha apontam para o frontend (`/reset-password`).
 - Mail em Docker usa `MAIL_MAILER=log` (sem SMTP real).
