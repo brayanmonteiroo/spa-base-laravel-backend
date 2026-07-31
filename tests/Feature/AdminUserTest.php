@@ -81,6 +81,28 @@ it('updates a user', function (): void {
         ->assertJsonPath('data.email', 'updated@spa-base.test');
 });
 
+it('updates a user without requiring a password', function (): void {
+    $admin = User::factory()->create();
+    $user = User::factory()->create([
+        'email' => 'keep-password@spa-base.test',
+        'password' => 'password',
+    ]);
+
+    $originalHash = $user->password;
+
+    $this->actingAs($admin)
+        ->putJson("/api/admin/users/{$user->id}", [
+            'name' => 'Name Only',
+            'email' => 'keep-password@spa-base.test',
+            'password' => '',
+            'password_confirmation' => '',
+        ])
+        ->assertOk()
+        ->assertJsonPath('data.name', 'Name Only');
+
+    expect($user->fresh()?->password)->toBe($originalHash);
+});
+
 it('deletes another user', function (): void {
     $admin = User::factory()->create();
     $user = User::factory()->create();

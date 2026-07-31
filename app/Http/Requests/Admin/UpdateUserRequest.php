@@ -19,6 +19,16 @@ final class UpdateUserRequest extends FormRequest
         return $this->user()?->can('update', $user) ?? false;
     }
 
+    protected function prepareForValidation(): void
+    {
+        if (blank($this->input('password'))) {
+            $this->merge([
+                'password' => null,
+                'password_confirmation' => null,
+            ]);
+        }
+    }
+
     /**
      * @return array<string, mixed>
      */
