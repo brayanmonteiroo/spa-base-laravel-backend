@@ -10,18 +10,21 @@ use App\Http\Requests\Admin\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 
 final class UserController extends Controller
 {
-    public function index(): AnonymousResourceCollection
+    public function index(Request $request): AnonymousResourceCollection
     {
         $this->authorize('viewAny', User::class);
 
+        $perPage = min(max($request->integer('per_page', 15), 1), 100);
+
         $users = User::query()
             ->orderBy('name')
-            ->paginate(15);
+            ->paginate($perPage);
 
         return UserResource::collection($users);
     }

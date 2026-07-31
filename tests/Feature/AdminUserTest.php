@@ -24,6 +24,17 @@ it('lists users for an authenticated user', function (): void {
         ]);
 });
 
+it('paginates users with a custom per_page', function (): void {
+    $admin = User::factory()->create();
+    User::factory()->count(10)->create();
+
+    $this->actingAs($admin)
+        ->getJson('/api/admin/users?per_page=5')
+        ->assertOk()
+        ->assertJsonCount(5, 'data')
+        ->assertJsonPath('meta.per_page', 5);
+});
+
 it('creates a user', function (): void {
     $admin = User::factory()->create();
 
