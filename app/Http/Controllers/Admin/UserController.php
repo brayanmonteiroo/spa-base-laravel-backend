@@ -20,9 +20,6 @@ final class UserController extends Controller
 {
     /**
      * Lista usuários paginados.
-     *
-     * @param IndexUserRequest $request
-     * @return AnonymousResourceCollection
      */
     public function index(IndexUserRequest $request): AnonymousResourceCollection
     {
@@ -54,9 +51,6 @@ final class UserController extends Controller
 
     /**
      * Cria um novo usuário.
-     *
-     * @param StoreUserRequest $request
-     * @return JsonResponse
      */
     public function store(StoreUserRequest $request): JsonResponse
     {
@@ -77,9 +71,6 @@ final class UserController extends Controller
 
     /**
      * Exibe detalhes de um usuário específico.
-     *
-     * @param User $user
-     * @return UserResource
      */
     public function show(User $user): UserResource
     {
@@ -90,10 +81,6 @@ final class UserController extends Controller
 
     /**
      * Atualiza um usuário existente.
-     *
-     * @param UpdateUserRequest $request
-     * @param User $user
-     * @return UserResource
      */
     public function update(UpdateUserRequest $request, User $user): UserResource
     {
@@ -114,9 +101,6 @@ final class UserController extends Controller
 
     /**
      * Exclui um usuário existente.
-     *
-     * @param User $user
-     * @return Response
      */
     public function destroy(User $user): Response
     {

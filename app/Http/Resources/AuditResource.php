@@ -20,7 +20,6 @@ final class AuditResource extends JsonResource
     /**
      * Converte a auditoria em um array.
      *
-     * @param Request $request
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array
