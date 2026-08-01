@@ -39,26 +39,8 @@ final class RoleController extends Controller
             ->when(
                 is_string($search) && $search !== '',
                 function ($query) use ($search): void {
-                    $needle = mb_strtolower($search);
                     $term = '%'.addcslashes($search, '%_\\').'%';
-                    $labelMatches = array_values(array_filter(
-                        array_map(
-                            static fn (RoleName $role): string => $role->value,
-                            RoleName::cases(),
-                        ),
-                        static fn (string $name): bool => str_contains(
-                            mb_strtolower(RoleName::labelFor($name)),
-                            $needle,
-                        ),
-                    ));
-
-                    $query->where(function ($builder) use ($term, $labelMatches): void {
-                        $builder->where('name', 'ilike', $term);
-
-                        if ($labelMatches !== []) {
-                            $builder->orWhereIn('name', $labelMatches);
-                        }
-                    });
+                    $query->where('name', 'ilike', $term);
                 },
             )
             ->orderBy($request->sortColumn(), $request->sortDirection())

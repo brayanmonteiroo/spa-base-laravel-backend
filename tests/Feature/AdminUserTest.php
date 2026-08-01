@@ -249,7 +249,7 @@ it('filtra usuários por perfil', function (): void {
     ]);
 
     $emails = $this->actingAs($admin)
-        ->getJson('/api/admin/users?role=user&per_page=50')
+        ->getJson('/api/admin/users?role='.RoleName::User->value.'&per_page=50')
         ->assertOk()
         ->json('data.*.email');
 

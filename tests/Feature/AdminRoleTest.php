@@ -61,7 +61,7 @@ it('exibe um perfil', function (): void {
         ->getJson("/api/admin/roles/{$role->id}")
         ->assertOk()
         ->assertJsonPath('data.name', RoleName::User->value)
-        ->assertJsonPath('data.label', 'Usuário');
+        ->assertJsonPath('data.label', RoleName::User->value);
 });
 
 it('atualiza um perfil e sincroniza permissões', function (): void {
@@ -151,7 +151,7 @@ it('filtra perfis pela busca', function (): void {
         ->assertJsonPath('data.0.name', 'filterable-role');
 });
 
-it('filtra perfis pelo rótulo exibido', function (): void {
+it('filtra perfis pelo nome exibido', function (): void {
     $admin = User::factory()->admin()->create();
 
     $this->actingAs($admin)
@@ -159,7 +159,7 @@ it('filtra perfis pelo rótulo exibido', function (): void {
         ->assertOk()
         ->assertJsonCount(1, 'data')
         ->assertJsonPath('data.0.name', RoleName::Admin->value)
-        ->assertJsonPath('data.0.label', 'Administrador');
+        ->assertJsonPath('data.0.label', RoleName::Admin->value);
 });
 
 it('ordena perfis por nome descendente', function (): void {
