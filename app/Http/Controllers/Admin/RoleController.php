@@ -10,6 +10,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\StoreRoleRequest;
 use App\Http\Requests\Admin\UpdateRoleRequest;
 use App\Http\Resources\RoleResource;
+use App\Models\Role;
 use App\Models\User;
 use App\Support\PermissionCatalog;
 use Illuminate\Http\JsonResponse;
@@ -18,7 +19,6 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
-use App\Models\Role;
 
 final class RoleController extends Controller
 {

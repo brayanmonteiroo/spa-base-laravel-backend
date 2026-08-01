@@ -4,8 +4,8 @@ declare(strict_types=1);
 
 use App\Enums\PermissionName;
 use App\Enums\RoleName;
-use App\Models\User;
 use App\Models\Role;
+use App\Models\User;
 
 it('blocks guests from listing roles', function (): void {
     $this->getJson('/api/admin/roles')->assertUnauthorized();

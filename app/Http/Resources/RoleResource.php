@@ -5,9 +5,9 @@ declare(strict_types=1);
 namespace App\Http\Resources;
 
 use App\Enums\RoleName;
+use App\Models\Role;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use App\Models\Role;
 
 /**
  * @mixin Role

@@ -1,0 +1,60 @@
+name: CI
+
+on:
+  push:
+    branches:
+      - main
+      - master
+  pull_request:
+    branches:
+      - main
+      - master
+
+jobs:
+  ci:
+    name: Lint & Test
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:18
+        env:
+          POSTGRES_USER: laravel
+          POSTGRES_PASSWORD: secret
+          POSTGRES_DB: spa_base_test
+        ports:
+          - 5432:5432
+        options: >-
+          --health-cmd "pg_isready -U laravel -d spa_base_test"
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    env:
+      APP_ENV: testing
+      APP_KEY: base64:G1vOwOFpt4ZjH56dLuJzN+zR9XLxEffT+PF2ZcA5Zkc=
+      DB_CONNECTION: pgsql
+      DB_HOST: 127.0.0.1
+      DB_PORT: 5432
+      DB_DATABASE: spa_base_test
+      DB_USERNAME: laravel
+      DB_PASSWORD: secret
+      DB_URL: ""
+      AUDITING_CONSOLE: "true"
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: "8.3"
+          extensions: mbstring, bcmath, pdo_pgsql, pgsql, tokenizer, xml, ctype, json, fileinfo, openssl
+          coverage: none
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-interaction --no-progress
+
+      - name: Run CI
+        run: composer ci
