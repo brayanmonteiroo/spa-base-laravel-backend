@@ -12,12 +12,14 @@ use OwenIt\Auditing\Models\Audit;
 
 /**
  * Payload completo para visualizações de detalhes de auditoria.
- *
  * @mixin Audit
  */
 final class AuditDetailResource extends JsonResource
 {
     /**
+     * Converte a auditoria em um array.
+     *
+     * @param Request $request
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array
