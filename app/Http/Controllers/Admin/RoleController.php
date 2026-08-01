@@ -7,6 +7,7 @@ namespace App\Http\Controllers\Admin;
 use App\Enums\PermissionName;
 use App\Enums\RoleName;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\IndexRoleRequest;
 use App\Http\Requests\Admin\StoreRoleRequest;
 use App\Http\Requests\Admin\UpdateRoleRequest;
 use App\Http\Resources\RoleResource;
@@ -22,11 +23,9 @@ use Illuminate\Validation\ValidationException;
 
 final class RoleController extends Controller
 {
-    public function index(Request $request): AnonymousResourceCollection
+    public function index(IndexRoleRequest $request): AnonymousResourceCollection
     {
-        $this->authorize('viewAny', Role::class);
-
-        $perPage = min(max($request->integer('per_page', 10), 1), 100);
+        $search = $request->validated('q');
 
         $roles = Role::query()
             ->where('guard_name', 'web')
@@ -37,8 +36,33 @@ final class RoleController extends Controller
                     ->whereColumn('role_id', 'roles.id')
                     ->where('model_type', (new User)->getMorphClass()),
             ])
-            ->orderBy('name')
-            ->paginate($perPage);
+            ->when(
+                is_string($search) && $search !== '',
+                function ($query) use ($search): void {
+                    $needle = mb_strtolower($search);
+                    $term = '%'.addcslashes($search, '%_\\').'%';
+                    $labelMatches = array_values(array_filter(
+                        array_map(
+                            static fn (RoleName $role): string => $role->value,
+                            RoleName::cases(),
+                        ),
+                        static fn (string $name): bool => str_contains(
+                            mb_strtolower(RoleName::labelFor($name)),
+                            $needle,
+                        ),
+                    ));
+
+                    $query->where(function ($builder) use ($term, $labelMatches): void {
+                        $builder->where('name', 'ilike', $term);
+
+                        if ($labelMatches !== []) {
+                            $builder->orWhereIn('name', $labelMatches);
+                        }
+                    });
+                },
+            )
+            ->orderBy($request->sortColumn(), $request->sortDirection())
+            ->paginate($request->perPage());
 
         return RoleResource::collection($roles);
     }

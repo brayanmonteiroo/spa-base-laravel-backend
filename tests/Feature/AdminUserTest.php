@@ -182,3 +182,67 @@ it('returns roles and permissions for the authenticated user', function (): void
 
     expect($permissions)->toEqualCanonicalizing(PermissionName::values());
 });
+
+it('sorts users by email descending', function (): void {
+    $admin = User::factory()->admin()->create([
+        'name' => 'Admin Sort',
+        'email' => 'admin-sort@spa-base.test',
+    ]);
+    User::factory()->create([
+        'name' => 'Alpha',
+        'email' => 'alpha@spa-base.test',
+    ]);
+    User::factory()->create([
+        'name' => 'Zulu',
+        'email' => 'zulu@spa-base.test',
+    ]);
+
+    $emails = $this->actingAs($admin)
+        ->getJson('/api/admin/users?sort=email&direction=desc&per_page=50')
+        ->assertOk()
+        ->json('data.*.email');
+
+    expect($emails)->toBe(collect($emails)->sortDesc()->values()->all());
+});
+
+it('filters users by search query', function (): void {
+    $admin = User::factory()->admin()->create();
+    User::factory()->create([
+        'name' => 'Unique Filter Name',
+        'email' => 'unique-filter@spa-base.test',
+    ]);
+    User::factory()->create([
+        'name' => 'Other Person',
+        'email' => 'other-person@spa-base.test',
+    ]);
+
+    $this->actingAs($admin)
+        ->getJson('/api/admin/users?q=Unique%20Filter')
+        ->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.email', 'unique-filter@spa-base.test');
+});
+
+it('filters users by role', function (): void {
+    $admin = User::factory()->admin()->create();
+    User::factory()->withUserRole()->create([
+        'email' => 'only-user-role@spa-base.test',
+    ]);
+
+    $emails = $this->actingAs($admin)
+        ->getJson('/api/admin/users?role=user&per_page=50')
+        ->assertOk()
+        ->json('data.*.email');
+
+    expect($emails)->toContain('only-user-role@spa-base.test')
+        ->and($emails)->not->toContain($admin->email);
+});
+
+it('rejects invalid user sort columns', function (): void {
+    $admin = User::factory()->admin()->create();
+
+    $this->actingAs($admin)
+        ->getJson('/api/admin/users?sort=password')
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['sort']);
+});

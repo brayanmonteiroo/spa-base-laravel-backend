@@ -5,27 +5,41 @@ declare(strict_types=1);
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Admin\IndexUserRequest;
 use App\Http\Requests\Admin\StoreUserRequest;
 use App\Http\Requests\Admin\UpdateUserRequest;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
-use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 
 final class UserController extends Controller
 {
-    public function index(Request $request): AnonymousResourceCollection
+    public function index(IndexUserRequest $request): AnonymousResourceCollection
     {
-        $this->authorize('viewAny', User::class);
-
-        $perPage = min(max($request->integer('per_page', 10), 1), 100);
+        $search = $request->validated('q');
+        $role = $request->validated('role');
 
         $users = User::query()
-            ->orderBy('name')
-            ->paginate($perPage);
+            ->when(
+                is_string($search) && $search !== '',
+                function ($query) use ($search): void {
+                    $term = '%'.addcslashes($search, '%_\\').'%';
+
+                    $query->where(function ($builder) use ($term): void {
+                        $builder->where('name', 'ilike', $term)
+                            ->orWhere('email', 'ilike', $term);
+                    });
+                },
+            )
+            ->when(
+                is_string($role) && $role !== '',
+                fn ($query) => $query->role($role),
+            )
+            ->orderBy($request->sortColumn(), $request->sortDirection())
+            ->paginate($request->perPage());
 
         return UserResource::collection($users);
     }

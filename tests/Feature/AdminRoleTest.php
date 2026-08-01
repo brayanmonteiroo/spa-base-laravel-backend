@@ -133,3 +133,51 @@ it('forbids the permission catalog without create or update permission', functio
         ->getJson('/api/admin/permissions/catalog')
         ->assertForbidden();
 });
+
+it('filters roles by search query', function (): void {
+    $admin = User::factory()->admin()->create();
+
+    $this->actingAs($admin)
+        ->postJson('/api/admin/roles', [
+            'name' => 'filterable-role',
+            'permissions' => [PermissionName::DashboardView->value],
+        ])
+        ->assertCreated();
+
+    $this->actingAs($admin)
+        ->getJson('/api/admin/roles?q=filterable')
+        ->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.name', 'filterable-role');
+});
+
+it('filters roles by display label', function (): void {
+    $admin = User::factory()->admin()->create();
+
+    $this->actingAs($admin)
+        ->getJson('/api/admin/roles?q=administrador')
+        ->assertOk()
+        ->assertJsonCount(1, 'data')
+        ->assertJsonPath('data.0.name', RoleName::Admin->value)
+        ->assertJsonPath('data.0.label', 'Administrador');
+});
+
+it('sorts roles by name descending', function (): void {
+    $admin = User::factory()->admin()->create();
+
+    $names = $this->actingAs($admin)
+        ->getJson('/api/admin/roles?sort=name&direction=desc&per_page=50')
+        ->assertOk()
+        ->json('data.*.name');
+
+    expect($names)->toBe(collect($names)->sortDesc()->values()->all());
+});
+
+it('rejects invalid role sort columns', function (): void {
+    $admin = User::factory()->admin()->create();
+
+    $this->actingAs($admin)
+        ->getJson('/api/admin/roles?sort=users_count')
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['sort']);
+});

@@ -120,3 +120,53 @@ it('records an audit when user roles change', function (): void {
         ->and($audit?->old_values['roles'] ?? null)->toContain(RoleName::User->value)
         ->and($audit?->new_values['roles'] ?? null)->toContain(RoleName::Admin->value);
 });
+
+it('filters audits by event', function (): void {
+    $admin = User::factory()->admin()->create();
+
+    $this->actingAs($admin)
+        ->postJson('/api/admin/users', [
+            'name' => 'Audit Filter User',
+            'email' => 'audit-filter@spa-base.test',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+            'roles' => [RoleName::User->value],
+        ])
+        ->assertCreated();
+
+    $events = $this->actingAs($admin)
+        ->getJson('/api/admin/audits?event=created&per_page=50')
+        ->assertOk()
+        ->json('data.*.event');
+
+    expect($events)->not->toBeEmpty()
+        ->and(collect($events)->every(fn (string $event): bool => $event === 'created'))->toBeTrue();
+});
+
+it('sorts audits by created_at ascending', function (): void {
+    $admin = User::factory()->admin()->create();
+
+    $this->actingAs($admin)
+        ->putJson("/api/admin/users/{$admin->id}", [
+            'name' => 'Admin Audit Sort',
+            'email' => $admin->email,
+            'roles' => [RoleName::Admin->value],
+        ])
+        ->assertOk();
+
+    $dates = $this->actingAs($admin)
+        ->getJson('/api/admin/audits?sort=created_at&direction=asc&per_page=50')
+        ->assertOk()
+        ->json('data.*.created_at');
+
+    expect($dates)->toBe(collect($dates)->sort()->values()->all());
+});
+
+it('rejects invalid audit sort columns', function (): void {
+    $admin = User::factory()->admin()->create();
+
+    $this->actingAs($admin)
+        ->getJson('/api/admin/audits?sort=ip_address')
+        ->assertUnprocessable()
+        ->assertJsonValidationErrors(['sort']);
+});
