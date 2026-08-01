@@ -3,6 +3,7 @@
 declare(strict_types=1);
 
 use App\Http\Controllers\Admin\AuditController;
+use App\Http\Controllers\Admin\DashboardController;
 use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
@@ -34,6 +35,7 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::post('/logout', [LogoutController::class, 'destroy']);
 
     Route::prefix('admin')->group(function (): void {
+        Route::get('dashboard/stats', [DashboardController::class, 'stats']);
         Route::get('permissions/catalog', [RoleController::class, 'catalog']);
         Route::get('audits', [AuditController::class, 'index']);
         Route::get('audits/{audit}', [AuditController::class, 'show']);

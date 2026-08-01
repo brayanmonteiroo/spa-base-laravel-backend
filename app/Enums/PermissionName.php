@@ -8,6 +8,7 @@ enum PermissionName: string
 {
     case DashboardSidebar = 'dashboard.sidebar';
     case DashboardView = 'dashboard.view';
+    case DashboardCards = 'dashboard.cards';
 
     case UsersSidebar = 'users.sidebar';
     case UsersView = 'users.view';

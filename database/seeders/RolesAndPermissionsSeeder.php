@@ -30,6 +30,7 @@ final class RolesAndPermissionsSeeder extends Seeder
         $user->syncPermissions([
             PermissionName::DashboardSidebar->value,
             PermissionName::DashboardView->value,
+            PermissionName::DashboardCards->value,
         ]);
     }
 }

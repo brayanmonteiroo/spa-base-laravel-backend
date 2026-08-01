@@ -26,6 +26,7 @@ final class PermissionCatalog
                         'permissions' => [
                             ['name' => PermissionName::DashboardSidebar->value, 'label' => 'Menu'],
                             ['name' => PermissionName::DashboardView->value, 'label' => 'Visualizar'],
+                            ['name' => PermissionName::DashboardCards->value, 'label' => 'Cards'],
                         ],
                     ],
                 ],
