@@ -4,14 +4,14 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
-use App\Models\User;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use Spatie\Permission\Models\Role;
 
 /**
- * @mixin User
+ * @mixin Role
  */
-final class UserResource extends JsonResource
+final class RoleResource extends JsonResource
 {
     /**
      * @return array<string, mixed>
@@ -21,12 +21,11 @@ final class UserResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
-            'email' => $this->email,
-            'email_verified_at' => $this->email_verified_at,
+            'guard_name' => $this->guard_name,
+            'permissions' => $this->getPermissionNames()->values(),
+            'users_count' => $this->users_count ?? $this->users()->count(),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
-            'roles' => $this->getRoleNames()->values(),
-            'permissions' => $this->getAllPermissions()->pluck('name')->values(),
         ];
     }
 }

@@ -2,14 +2,24 @@
 
 declare(strict_types=1);
 
+use App\Enums\PermissionName;
+use App\Enums\RoleName;
 use App\Models\User;
 
 it('blocks guests from listing users', function (): void {
     $this->getJson('/api/admin/users')->assertUnauthorized();
 });
 
-it('lists users for an authenticated user', function (): void {
-    $admin = User::factory()->create();
+it('forbids listing users without permission', function (): void {
+    $user = User::factory()->withUserRole()->create();
+
+    $this->actingAs($user)
+        ->getJson('/api/admin/users')
+        ->assertForbidden();
+});
+
+it('lists users for an admin', function (): void {
+    $admin = User::factory()->admin()->create();
     User::factory()->count(2)->create();
 
     $this->actingAs($admin)
@@ -17,7 +27,7 @@ it('lists users for an authenticated user', function (): void {
         ->assertOk()
         ->assertJsonStructure([
             'data' => [
-                ['id', 'name', 'email'],
+                ['id', 'name', 'email', 'roles', 'permissions'],
             ],
             'links',
             'meta',
@@ -25,7 +35,7 @@ it('lists users for an authenticated user', function (): void {
 });
 
 it('paginates users with a custom per_page', function (): void {
-    $admin = User::factory()->create();
+    $admin = User::factory()->admin()->create();
     User::factory()->count(10)->create();
 
     $this->actingAs($admin)
@@ -36,7 +46,7 @@ it('paginates users with a custom per_page', function (): void {
 });
 
 it('creates a user', function (): void {
-    $admin = User::factory()->create();
+    $admin = User::factory()->admin()->create();
 
     $this->actingAs($admin)
         ->postJson('/api/admin/users', [
@@ -55,8 +65,21 @@ it('creates a user', function (): void {
     ]);
 });
 
+it('forbids creating a user without permission', function (): void {
+    $user = User::factory()->withUserRole()->create();
+
+    $this->actingAs($user)
+        ->postJson('/api/admin/users', [
+            'name' => 'Blocked',
+            'email' => 'blocked@spa-base.test',
+            'password' => 'password',
+            'password_confirmation' => 'password',
+        ])
+        ->assertForbidden();
+});
+
 it('shows a user', function (): void {
-    $admin = User::factory()->create();
+    $admin = User::factory()->admin()->create();
     $user = User::factory()->create();
 
     $this->actingAs($admin)
@@ -65,8 +88,17 @@ it('shows a user', function (): void {
         ->assertJsonPath('data.id', $user->id);
 });
 
+it('forbids showing a user without permission', function (): void {
+    $actor = User::factory()->withUserRole()->create();
+    $user = User::factory()->create();
+
+    $this->actingAs($actor)
+        ->getJson("/api/admin/users/{$user->id}")
+        ->assertForbidden();
+});
+
 it('updates a user', function (): void {
-    $admin = User::factory()->create();
+    $admin = User::factory()->admin()->create();
     $user = User::factory()->create([
         'email' => 'old@spa-base.test',
     ]);
@@ -82,7 +114,7 @@ it('updates a user', function (): void {
 });
 
 it('updates a user without requiring a password', function (): void {
-    $admin = User::factory()->create();
+    $admin = User::factory()->admin()->create();
     $user = User::factory()->create([
         'email' => 'keep-password@spa-base.test',
         'password' => 'password',
@@ -104,7 +136,7 @@ it('updates a user without requiring a password', function (): void {
 });
 
 it('deletes another user', function (): void {
-    $admin = User::factory()->create();
+    $admin = User::factory()->admin()->create();
     $user = User::factory()->create();
 
     $this->actingAs($admin)
@@ -117,7 +149,7 @@ it('deletes another user', function (): void {
 });
 
 it('prevents self-deletion', function (): void {
-    $admin = User::factory()->create();
+    $admin = User::factory()->admin()->create();
 
     $this->actingAs($admin)
         ->deleteJson("/api/admin/users/{$admin->id}")
@@ -126,4 +158,17 @@ it('prevents self-deletion', function (): void {
     $this->assertDatabaseHas('users', [
         'id' => $admin->id,
     ]);
+});
+
+it('returns roles and permissions for the authenticated user', function (): void {
+    $admin = User::factory()->admin()->create();
+
+    $response = $this->actingAs($admin)
+        ->getJson('/api/user')
+        ->assertOk()
+        ->assertJsonPath('data.roles.0', RoleName::Admin->value);
+
+    $permissions = $response->json('data.permissions');
+
+    expect($permissions)->toEqualCanonicalizing(PermissionName::values());
 });

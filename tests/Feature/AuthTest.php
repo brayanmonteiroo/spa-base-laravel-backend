@@ -16,12 +16,21 @@ function spaHeaders(): array
 }
 
 it('returns the authenticated user', function (): void {
-    $user = User::factory()->create();
+    $user = User::factory()->withUserRole()->create();
 
     $this->actingAs($user)
         ->getJson('/api/user')
         ->assertOk()
-        ->assertJsonPath('data.email', $user->email);
+        ->assertJsonPath('data.email', $user->email)
+        ->assertJsonStructure([
+            'data' => [
+                'id',
+                'name',
+                'email',
+                'roles',
+                'permissions',
+            ],
+        ]);
 });
 
 it('rejects guests from the authenticated user endpoint', function (): void {

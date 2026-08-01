@@ -2,6 +2,7 @@
 
 declare(strict_types=1);
 
+use App\Http\Controllers\Admin\RoleController;
 use App\Http\Controllers\Admin\UserController;
 use App\Http\Controllers\Auth\ForgotPasswordController;
 use App\Http\Controllers\Auth\LoginController;
@@ -32,6 +33,8 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::post('/logout', [LogoutController::class, 'destroy']);
 
     Route::prefix('admin')->group(function (): void {
+        Route::get('permissions/catalog', [RoleController::class, 'catalog']);
+        Route::apiResource('roles', RoleController::class);
         Route::apiResource('users', UserController::class);
     });
 });

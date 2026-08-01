@@ -158,6 +158,9 @@ Credenciais padrão:
 
 - E-mail: `admin@spa-base.test`
 - Senha: `password`
+- Role: `admin` (todas as permissions de Painel + Usuários)
+
+O seeder também cria o role `user` (`dashboard.sidebar` + `dashboard.view`) e atribui aos usuários de factory.
 
 ### Testes
 
@@ -184,6 +187,7 @@ Não use `migrate:fresh` no `.env` de desenvolvimento achando que está “só t
 
 ## Observações
 
+- Timezone: `America/Belem` (`APP_TIMEZONE` + `TZ` no `.env`) — containers PHP herdam via `env_file`.
 - Logs: canal `daily` (`LOG_STACK=daily`) com retenção de **30 dias** (`LOG_DAILY_DAYS=30`) — arquivos em `storage/logs/laravel-YYYY-MM-DD.log`.
 - `FRONTEND_URL` e `SANCTUM_STATEFUL_DOMAINS` devem bater com o Quasar (`localhost:9020`).
 - Links de reset de senha apontam para o frontend (`/reset-password`).
