@@ -37,7 +37,7 @@ final class UserController extends Controller
 
         $user = DB::transaction(function () use ($data, $roles): User {
             $user = User::query()->create($data);
-            $user->syncRoles($roles);
+            $user->syncAuditedRoles($roles);
 
             return $user;
         });
@@ -65,7 +65,7 @@ final class UserController extends Controller
 
         DB::transaction(function () use ($user, $data, $roles): void {
             $user->update($data);
-            $user->syncRoles($roles);
+            $user->syncAuditedRoles($roles);
         });
 
         return new UserResource($user->refresh());

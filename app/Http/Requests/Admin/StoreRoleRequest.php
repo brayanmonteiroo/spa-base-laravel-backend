@@ -12,7 +12,7 @@ final class StoreRoleRequest extends FormRequest
 {
     public function authorize(): bool
     {
-        return $this->user()?->can('create', \Spatie\Permission\Models\Role::class) ?? false;
+        return $this->user()?->can('create', \App\Models\Role::class) ?? false;
     }
 
     /**

@@ -7,7 +7,7 @@ namespace App\Http\Resources;
 use App\Enums\RoleName;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
-use Spatie\Permission\Models\Role;
+use App\Models\Role;
 
 /**
  * @mixin Role

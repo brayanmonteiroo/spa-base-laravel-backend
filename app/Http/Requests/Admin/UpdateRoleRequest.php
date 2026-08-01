@@ -7,7 +7,7 @@ namespace App\Http\Requests\Admin;
 use App\Support\PermissionCatalog;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Validation\Rule;
-use Spatie\Permission\Models\Role;
+use App\Models\Role;
 
 final class UpdateRoleRequest extends FormRequest
 {

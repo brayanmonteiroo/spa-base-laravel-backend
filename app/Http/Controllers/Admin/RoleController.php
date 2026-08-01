@@ -18,7 +18,7 @@ use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Validation\ValidationException;
-use Spatie\Permission\Models\Role;
+use App\Models\Role;
 
 final class RoleController extends Controller
 {
@@ -113,7 +113,7 @@ final class RoleController extends Controller
         );
 
         return response()->json([
-            'data' => PermissionCatalog::groups(),
+            'data' => PermissionCatalog::sections(),
         ]);
     }
 

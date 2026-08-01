@@ -7,7 +7,7 @@ namespace App\Policies;
 use App\Enums\PermissionName;
 use App\Enums\RoleName;
 use App\Models\User;
-use Spatie\Permission\Models\Role;
+use App\Models\Role;
 
 final class RolePolicy
 {

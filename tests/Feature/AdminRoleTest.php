@@ -5,7 +5,7 @@ declare(strict_types=1);
 use App\Enums\PermissionName;
 use App\Enums\RoleName;
 use App\Models\User;
-use Spatie\Permission\Models\Role;
+use App\Models\Role;
 
 it('blocks guests from listing roles', function (): void {
     $this->getJson('/api/admin/roles')->assertUnauthorized();
@@ -118,9 +118,12 @@ it('returns the permission catalog for admins', function (): void {
     $this->actingAs($admin)
         ->getJson('/api/admin/permissions/catalog')
         ->assertOk()
-        ->assertJsonPath('data.0.key', 'dashboard')
-        ->assertJsonPath('data.1.key', 'users')
-        ->assertJsonPath('data.2.key', 'roles');
+        ->assertJsonPath('data.0.key', 'menu')
+        ->assertJsonPath('data.0.modules.0.key', 'dashboard')
+        ->assertJsonPath('data.1.key', 'settings')
+        ->assertJsonPath('data.1.modules.0.key', 'users')
+        ->assertJsonPath('data.1.modules.1.key', 'roles')
+        ->assertJsonPath('data.1.modules.2.key', 'audit');
 });
 
 it('forbids the permission catalog without create or update permission', function (): void {

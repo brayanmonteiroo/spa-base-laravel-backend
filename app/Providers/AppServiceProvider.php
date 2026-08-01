@@ -4,12 +4,14 @@ declare(strict_types=1);
 
 namespace App\Providers;
 
+use App\Models\Role;
 use App\Models\User;
+use App\Policies\AuditPolicy;
 use App\Policies\RolePolicy;
 use Illuminate\Auth\Notifications\ResetPassword;
 use Illuminate\Support\Facades\Gate;
 use Illuminate\Support\ServiceProvider;
-use Spatie\Permission\Models\Role;
+use OwenIt\Auditing\Models\Audit;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -27,6 +29,7 @@ class AppServiceProvider extends ServiceProvider
     public function boot(): void
     {
         Gate::policy(Role::class, RolePolicy::class);
+        Gate::policy(Audit::class, AuditPolicy::class);
 
         ResetPassword::createUrlUsing(function (User $user, string $token): string {
             $frontendUrl = rtrim((string) config('app.frontend_url'), '/');

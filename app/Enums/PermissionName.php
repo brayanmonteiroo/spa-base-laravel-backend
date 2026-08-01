@@ -23,6 +23,9 @@ enum PermissionName: string
     case RolesUpdate = 'roles.update';
     case RolesDelete = 'roles.delete';
 
+    case AuditSidebar = 'audit.sidebar';
+    case AuditView = 'audit.view';
+
     /**
      * @return list<string>
      */

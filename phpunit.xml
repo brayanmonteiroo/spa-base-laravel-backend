@@ -38,5 +38,6 @@
         <server name="PULSE_ENABLED" value="false"/>
         <server name="TELESCOPE_ENABLED" value="false"/>
         <server name="NIGHTWATCH_ENABLED" value="false"/>
+        <server name="AUDITING_CONSOLE" value="true"/>
     </php>
 </phpunit>
