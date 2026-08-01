@@ -36,6 +36,7 @@ Route::middleware('auth:sanctum')->group(function (): void {
     Route::prefix('admin')->group(function (): void {
         Route::get('permissions/catalog', [RoleController::class, 'catalog']);
         Route::get('audits', [AuditController::class, 'index']);
+        Route::get('audits/{audit}', [AuditController::class, 'show']);
         Route::apiResource('roles', RoleController::class);
         Route::apiResource('users', UserController::class);
     });

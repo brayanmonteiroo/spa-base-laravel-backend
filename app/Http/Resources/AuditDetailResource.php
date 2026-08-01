@@ -11,16 +11,13 @@ use Illuminate\Http\Resources\Json\JsonResource;
 use OwenIt\Auditing\Models\Audit;
 
 /**
- * Payload simplificado para visualizações de auditorias na lista.
+ * Payload completo para visualizações de detalhes de auditoria.
  *
  * @mixin Audit
  */
-final class AuditResource extends JsonResource
+final class AuditDetailResource extends JsonResource
 {
     /**
-     * Converte a auditoria em um array.
-     *
-     * @param Request $request
      * @return array<string, mixed>
      */
     public function toArray(Request $request): array
@@ -44,6 +41,10 @@ final class AuditResource extends JsonResource
                 ]
                 : null,
             'ip_address' => $this->ip_address,
+            'url' => $this->url,
+            'user_agent' => $this->user_agent,
+            'old_values' => $this->old_values,
+            'new_values' => $this->new_values,
             'created_at' => $this->created_at,
         ];
     }

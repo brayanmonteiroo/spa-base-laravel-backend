@@ -45,15 +45,16 @@ it('lists audits for an admin', function (): void {
                     'auditable_id',
                     'user',
                     'ip_address',
-                    'url',
-                    'old_values',
-                    'new_values',
                     'created_at',
                 ],
             ],
             'links',
             'meta',
-        ]);
+        ])
+        ->assertJsonMissingPath('data.0.old_values')
+        ->assertJsonMissingPath('data.0.new_values')
+        ->assertJsonMissingPath('data.0.url')
+        ->assertJsonMissingPath('data.0.user_agent');
 
     $first = $this->actingAs($admin)
         ->getJson('/api/admin/audits')
@@ -61,6 +62,62 @@ it('lists audits for an admin', function (): void {
 
     expect($first['event_label'])->toBeIn(['Criado', 'Atualizado', 'Perfis atualizados'])
         ->and($first['auditable_label'])->toBeIn(['Usuário', 'Perfil']);
+});
+
+it('shows audit details for an admin', function (): void {
+    $admin = User::factory()->admin()->create();
+
+    $this->actingAs($admin)
+        ->putJson("/api/admin/users/{$admin->id}", [
+            'name' => 'Admin Detail Audit',
+            'email' => $admin->email,
+            'roles' => [RoleName::Admin->value],
+        ])
+        ->assertOk();
+
+    $auditId = Audit::query()->latest('id')->value('id');
+
+    expect($auditId)->not->toBeNull();
+
+    $this->actingAs($admin)
+        ->getJson("/api/admin/audits/{$auditId}")
+        ->assertOk()
+        ->assertJsonStructure([
+            'data' => [
+                'id',
+                'event',
+                'event_label',
+                'auditable_type',
+                'auditable_label',
+                'auditable_id',
+                'user',
+                'ip_address',
+                'url',
+                'user_agent',
+                'old_values',
+                'new_values',
+                'created_at',
+            ],
+        ]);
+});
+
+it('forbids showing an audit without permission', function (): void {
+    $admin = User::factory()->admin()->create();
+    $user = User::factory()->withUserRole()->create();
+
+    $this->actingAs($admin)
+        ->putJson("/api/admin/users/{$admin->id}", [
+            'name' => 'Admin Forbidden Show',
+            'email' => $admin->email,
+            'roles' => [RoleName::Admin->value],
+        ])
+        ->assertOk();
+
+    $auditId = Audit::query()->latest('id')->value('id');
+
+    $this->actingAs($user)
+        ->getJson("/api/admin/audits/{$auditId}")
+        ->assertForbidden();
 });
 
 it('records an audit when a user is created', function (): void {

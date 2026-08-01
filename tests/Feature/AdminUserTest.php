@@ -27,10 +27,29 @@ it('lists users for an admin', function (): void {
         ->assertOk()
         ->assertJsonStructure([
             'data' => [
-                ['id', 'name', 'email', 'roles', 'permissions'],
+                ['id', 'name', 'email', 'roles'],
             ],
             'links',
             'meta',
+        ])
+        ->assertJsonMissingPath('data.0.permissions');
+});
+
+it('includes permissions when showing a single user', function (): void {
+    $admin = User::factory()->admin()->create();
+    $user = User::factory()->withUserRole()->create();
+
+    $this->actingAs($admin)
+        ->getJson("/api/admin/users/{$user->id}")
+        ->assertOk()
+        ->assertJsonStructure([
+            'data' => [
+                'id',
+                'name',
+                'email',
+                'roles',
+                'permissions',
+            ],
         ]);
 });
 

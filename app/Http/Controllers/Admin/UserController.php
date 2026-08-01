@@ -8,6 +8,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Admin\IndexUserRequest;
 use App\Http\Requests\Admin\StoreUserRequest;
 use App\Http\Requests\Admin\UpdateUserRequest;
+use App\Http\Resources\UserListResource;
 use App\Http\Resources\UserResource;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -17,12 +18,16 @@ use Illuminate\Support\Facades\DB;
 
 final class UserController extends Controller
 {
+    /**
+     * Lista usuários paginados.
+     */
     public function index(IndexUserRequest $request): AnonymousResourceCollection
     {
         $search = $request->validated('q');
         $role = $request->validated('role');
 
         $users = User::query()
+            ->with('roles')
             ->when(
                 is_string($search) && $search !== '',
                 function ($query) use ($search): void {
@@ -41,9 +46,12 @@ final class UserController extends Controller
             ->orderBy($request->sortColumn(), $request->sortDirection())
             ->paginate($request->perPage());
 
-        return UserResource::collection($users);
+        return UserListResource::collection($users);
     }
 
+    /**
+     * Cria um novo usuário.
+     */
     public function store(StoreUserRequest $request): JsonResponse
     {
         $roles = $request->validated('roles');
@@ -61,6 +69,9 @@ final class UserController extends Controller
             ->setStatusCode(201);
     }
 
+    /**
+     * Exibe detalhes de um usuário específico.
+     */
     public function show(User $user): UserResource
     {
         $this->authorize('view', $user);
@@ -68,6 +79,9 @@ final class UserController extends Controller
         return new UserResource($user);
     }
 
+    /**
+     * Atualiza um usuário existente.
+     */
     public function update(UpdateUserRequest $request, User $user): UserResource
     {
         $roles = $request->validated('roles');
