@@ -48,6 +48,14 @@ final class UpdateUserRequest extends FormRequest
                 Rule::unique('users', 'email')->ignore($user->id),
             ],
             'password' => ['nullable', 'confirmed', Password::defaults()],
+            'roles' => ['required', 'array', 'min:1'],
+            'roles.*' => [
+                'required',
+                'string',
+                Rule::exists('roles', 'name')->where(
+                    fn ($query) => $query->where('guard_name', 'web'),
+                ),
+            ],
         ];
     }
 }

@@ -13,6 +13,7 @@ use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Http\Response;
+use Illuminate\Support\Facades\DB;
 
 final class UserController extends Controller
 {
@@ -31,7 +32,15 @@ final class UserController extends Controller
 
     public function store(StoreUserRequest $request): JsonResponse
     {
-        $user = User::query()->create($request->validated());
+        $roles = $request->validated('roles');
+        $data = $request->safe()->except(['roles']);
+
+        $user = DB::transaction(function () use ($data, $roles): User {
+            $user = User::query()->create($data);
+            $user->syncRoles($roles);
+
+            return $user;
+        });
 
         return (new UserResource($user))
             ->response()
@@ -47,13 +56,17 @@ final class UserController extends Controller
 
     public function update(UpdateUserRequest $request, User $user): UserResource
     {
-        $data = $request->validated();
+        $roles = $request->validated('roles');
+        $data = $request->safe()->except(['roles']);
 
         if (! array_key_exists('password', $data) || blank($data['password'])) {
             unset($data['password']);
         }
 
-        $user->update($data);
+        DB::transaction(function () use ($user, $data, $roles): void {
+            $user->update($data);
+            $user->syncRoles($roles);
+        });
 
         return new UserResource($user->refresh());
     }

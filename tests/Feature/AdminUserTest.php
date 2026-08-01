@@ -54,15 +54,19 @@ it('creates a user', function (): void {
             'email' => 'new@spa-base.test',
             'password' => 'password',
             'password_confirmation' => 'password',
+            'roles' => [RoleName::User->value],
         ])
         ->assertCreated()
         ->assertJsonPath('data.email', 'new@spa-base.test')
+        ->assertJsonPath('data.roles.0', RoleName::User->value)
         ->assertJsonMissingPath('data.password');
 
     $this->assertDatabaseHas('users', [
         'email' => 'new@spa-base.test',
         'name' => 'New User',
     ]);
+
+    expect(User::query()->where('email', 'new@spa-base.test')->first()?->hasRole(RoleName::User))->toBeTrue();
 });
 
 it('forbids creating a user without permission', function (): void {
@@ -74,6 +78,7 @@ it('forbids creating a user without permission', function (): void {
             'email' => 'blocked@spa-base.test',
             'password' => 'password',
             'password_confirmation' => 'password',
+            'roles' => [RoleName::User->value],
         ])
         ->assertForbidden();
 });
@@ -99,7 +104,7 @@ it('forbids showing a user without permission', function (): void {
 
 it('updates a user', function (): void {
     $admin = User::factory()->admin()->create();
-    $user = User::factory()->create([
+    $user = User::factory()->withUserRole()->create([
         'email' => 'old@spa-base.test',
     ]);
 
@@ -107,15 +112,19 @@ it('updates a user', function (): void {
         ->putJson("/api/admin/users/{$user->id}", [
             'name' => 'Updated Name',
             'email' => 'updated@spa-base.test',
+            'roles' => [RoleName::Admin->value],
         ])
         ->assertOk()
         ->assertJsonPath('data.name', 'Updated Name')
-        ->assertJsonPath('data.email', 'updated@spa-base.test');
+        ->assertJsonPath('data.email', 'updated@spa-base.test')
+        ->assertJsonPath('data.roles.0', RoleName::Admin->value);
+
+    expect($user->fresh()?->hasRole(RoleName::Admin))->toBeTrue();
 });
 
 it('updates a user without requiring a password', function (): void {
     $admin = User::factory()->admin()->create();
-    $user = User::factory()->create([
+    $user = User::factory()->withUserRole()->create([
         'email' => 'keep-password@spa-base.test',
         'password' => 'password',
     ]);
@@ -128,6 +137,7 @@ it('updates a user without requiring a password', function (): void {
             'email' => 'keep-password@spa-base.test',
             'password' => '',
             'password_confirmation' => '',
+            'roles' => [RoleName::User->value],
         ])
         ->assertOk()
         ->assertJsonPath('data.name', 'Name Only');

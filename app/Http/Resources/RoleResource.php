@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Http\Resources;
 
+use App\Enums\RoleName;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
 use Spatie\Permission\Models\Role;
@@ -21,6 +22,7 @@ final class RoleResource extends JsonResource
         return [
             'id' => $this->id,
             'name' => $this->name,
+            'label' => RoleName::labelFor((string) $this->name),
             'guard_name' => $this->guard_name,
             'permissions' => $this->getPermissionNames()->values(),
             'users_count' => $this->users_count ?? $this->users()->count(),

@@ -27,7 +27,7 @@ it('lists roles for an admin', function (): void {
         ->assertOk()
         ->assertJsonStructure([
             'data' => [
-                ['id', 'name', 'permissions', 'users_count'],
+                ['id', 'name', 'label', 'permissions', 'users_count'],
             ],
             'links',
             'meta',
@@ -60,7 +60,8 @@ it('shows a role', function (): void {
     $this->actingAs($admin)
         ->getJson("/api/admin/roles/{$role->id}")
         ->assertOk()
-        ->assertJsonPath('data.name', RoleName::User->value);
+        ->assertJsonPath('data.name', RoleName::User->value)
+        ->assertJsonPath('data.label', 'Usuário');
 });
 
 it('updates a role and syncs permissions', function (): void {
