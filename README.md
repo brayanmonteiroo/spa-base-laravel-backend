@@ -162,11 +162,31 @@ Credenciais padrão:
 
 O seeder também cria o role `user` (`dashboard.sidebar` + `dashboard.view`) e atribui aos usuários de factory.
 
-### Testes
+### Testes e CI
+
+Rodar **sempre no container `workspace`** (precisa do Postgres no Compose):
 
 ```bash
+# Só testes (Pest)
 docker compose -f compose.dev.yaml exec workspace php artisan test
+
+# Lint (Pint --test) + testes — mesmo pipeline do GitHub Actions
+docker compose -f compose.dev.yaml exec workspace composer ci
 ```
+
+Scripts Composer:
+
+| Script | O que faz |
+|--------|-----------|
+| `composer lint` | `pint --test` (não altera arquivos) |
+| `composer test` | limpa config + Pest |
+| `composer ci` | `lint` + `test` |
+
+### GitHub Actions
+
+Workflow [`.github/workflows/ci.yml`](.github/workflows/ci.yml): em push/PR para `main`/`master`, sobe Postgres de serviço, PHP **8.5**, `composer install` e `composer ci`.
+
+`APP_KEY` é gerada no job (não fica hardcoded no YAML). Localmente use o Docker; no Actions o host do banco é `127.0.0.1`.
 
 ## Banco de testes
 
