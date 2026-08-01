@@ -15,7 +15,7 @@ function spaHeaders(): array
     ];
 }
 
-it('returns the authenticated user', function (): void {
+it('retorna o usuário autenticado', function (): void {
     $user = User::factory()->withUserRole()->create();
 
     $this->actingAs($user)
@@ -33,11 +33,11 @@ it('returns the authenticated user', function (): void {
         ]);
 });
 
-it('rejects guests from the authenticated user endpoint', function (): void {
+it('rejeita visitantes no endpoint do usuário autenticado', function (): void {
     $this->getJson('/api/user')->assertUnauthorized();
 });
 
-it('logs in with valid credentials and regenerates the session', function (): void {
+it('faz login com credenciais válidas e regenera a sessão', function (): void {
     $user = User::factory()->create([
         'email' => 'admin@spa-base.test',
         'password' => 'password',
@@ -55,7 +55,7 @@ it('logs in with valid credentials and regenerates the session', function (): vo
     $this->assertAuthenticated('web');
 });
 
-it('rejects invalid login credentials', function (): void {
+it('rejeita credenciais de login inválidas', function (): void {
     User::factory()->create([
         'email' => 'admin@spa-base.test',
         'password' => 'password',
@@ -71,7 +71,7 @@ it('rejects invalid login credentials', function (): void {
     $this->assertGuest('web');
 });
 
-it('logs out an authenticated user', function (): void {
+it('faz logout do usuário autenticado', function (): void {
     $user = User::factory()->create();
 
     $this->withoutMiddleware(ValidateCsrfToken::class)
@@ -84,7 +84,7 @@ it('logs out an authenticated user', function (): void {
     $this->assertGuest('web');
 });
 
-it('sends a password reset link', function (): void {
+it('envia link de redefinição de senha', function (): void {
     Notification::fake();
 
     $user = User::factory()->create([
@@ -99,7 +99,7 @@ it('sends a password reset link', function (): void {
     Notification::assertSentTo($user, ResetPassword::class);
 });
 
-it('resets the password with a valid token', function (): void {
+it('redefine a senha com token válido', function (): void {
     Notification::fake();
 
     $user = User::factory()->create([

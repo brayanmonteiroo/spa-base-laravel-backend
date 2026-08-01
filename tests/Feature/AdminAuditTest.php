@@ -6,11 +6,11 @@ use App\Enums\RoleName;
 use App\Models\User;
 use OwenIt\Auditing\Models\Audit;
 
-it('blocks guests from listing audits', function (): void {
+it('bloqueia visitantes de listar auditorias', function (): void {
     $this->getJson('/api/admin/audits')->assertUnauthorized();
 });
 
-it('forbids listing audits without permission', function (): void {
+it('proíbe listar auditorias sem permissão', function (): void {
     $user = User::factory()->withUserRole()->create();
 
     $this->actingAs($user)
@@ -18,7 +18,7 @@ it('forbids listing audits without permission', function (): void {
         ->assertForbidden();
 });
 
-it('lists audits for an admin', function (): void {
+it('lista auditorias para um administrador', function (): void {
     $admin = User::factory()->admin()->create();
 
     $this->actingAs($admin)
@@ -64,7 +64,7 @@ it('lists audits for an admin', function (): void {
         ->and($first['auditable_label'])->toBeIn(['Usuário', 'Perfil']);
 });
 
-it('shows audit details for an admin', function (): void {
+it('mostra detalhes de auditoria para um administrador', function (): void {
     $admin = User::factory()->admin()->create();
 
     $this->actingAs($admin)
@@ -101,7 +101,7 @@ it('shows audit details for an admin', function (): void {
         ]);
 });
 
-it('forbids showing an audit without permission', function (): void {
+it('proíbe ver auditoria sem permissão', function (): void {
     $admin = User::factory()->admin()->create();
     $user = User::factory()->withUserRole()->create();
 
@@ -120,7 +120,7 @@ it('forbids showing an audit without permission', function (): void {
         ->assertForbidden();
 });
 
-it('records an audit when a user is created', function (): void {
+it('registra auditoria ao criar um usuário', function (): void {
     $admin = User::factory()->admin()->create();
 
     $this->actingAs($admin)
@@ -152,7 +152,7 @@ it('records an audit when a user is created', function (): void {
         )->toBeTrue();
 });
 
-it('records an audit when user roles change', function (): void {
+it('registra auditoria ao alterar perfis do usuário', function (): void {
     $admin = User::factory()->admin()->create();
     $user = User::factory()->withUserRole()->create([
         'email' => 'role-change@spa-base.test',
@@ -178,7 +178,7 @@ it('records an audit when user roles change', function (): void {
         ->and($audit?->new_values['roles'] ?? null)->toContain(RoleName::Admin->value);
 });
 
-it('filters audits by event', function (): void {
+it('filtra auditorias por evento', function (): void {
     $admin = User::factory()->admin()->create();
 
     $this->actingAs($admin)
@@ -200,7 +200,7 @@ it('filters audits by event', function (): void {
         ->and(collect($events)->every(fn (string $event): bool => $event === 'created'))->toBeTrue();
 });
 
-it('sorts audits by created_at ascending', function (): void {
+it('ordena auditorias por data de criação ascendente', function (): void {
     $admin = User::factory()->admin()->create();
 
     $this->actingAs($admin)
@@ -219,7 +219,7 @@ it('sorts audits by created_at ascending', function (): void {
     expect($dates)->toBe(collect($dates)->sort()->values()->all());
 });
 
-it('rejects invalid audit sort columns', function (): void {
+it('rejeita colunas de ordenação inválidas em auditorias', function (): void {
     $admin = User::factory()->admin()->create();
 
     $this->actingAs($admin)

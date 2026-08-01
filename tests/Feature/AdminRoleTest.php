@@ -7,11 +7,11 @@ use App\Enums\RoleName;
 use App\Models\Role;
 use App\Models\User;
 
-it('blocks guests from listing roles', function (): void {
+it('bloqueia visitantes de listar perfis', function (): void {
     $this->getJson('/api/admin/roles')->assertUnauthorized();
 });
 
-it('forbids listing roles without permission', function (): void {
+it('proíbe listar perfis sem permissão', function (): void {
     $user = User::factory()->withUserRole()->create();
 
     $this->actingAs($user)
@@ -19,7 +19,7 @@ it('forbids listing roles without permission', function (): void {
         ->assertForbidden();
 });
 
-it('lists roles for an admin', function (): void {
+it('lista perfis para um administrador', function (): void {
     $admin = User::factory()->admin()->create();
 
     $this->actingAs($admin)
@@ -34,7 +34,7 @@ it('lists roles for an admin', function (): void {
         ]);
 });
 
-it('creates a role with permissions', function (): void {
+it('cria um perfil com permissões', function (): void {
     $admin = User::factory()->admin()->create();
 
     $this->actingAs($admin)
@@ -53,7 +53,7 @@ it('creates a role with permissions', function (): void {
     expect($role->hasPermissionTo(PermissionName::DashboardView->value))->toBeTrue();
 });
 
-it('shows a role', function (): void {
+it('exibe um perfil', function (): void {
     $admin = User::factory()->admin()->create();
     $role = Role::findByName(RoleName::User->value, 'web');
 
@@ -64,7 +64,7 @@ it('shows a role', function (): void {
         ->assertJsonPath('data.label', 'Usuário');
 });
 
-it('updates a role and syncs permissions', function (): void {
+it('atualiza um perfil e sincroniza permissões', function (): void {
     $admin = User::factory()->admin()->create();
     $role = Role::create(['name' => 'editor', 'guard_name' => 'web']);
 
@@ -82,7 +82,7 @@ it('updates a role and syncs permissions', function (): void {
         ->and($role->fresh()->hasPermissionTo(PermissionName::DashboardView->value))->toBeFalse();
 });
 
-it('forbids deleting the admin role', function (): void {
+it('proíbe excluir o perfil admin', function (): void {
     $admin = User::factory()->admin()->create();
     $role = Role::findByName(RoleName::Admin->value, 'web');
 
@@ -91,7 +91,7 @@ it('forbids deleting the admin role', function (): void {
         ->assertForbidden();
 });
 
-it('forbids deleting a role that still has users', function (): void {
+it('proíbe excluir perfil que ainda tem usuários', function (): void {
     $admin = User::factory()->admin()->create();
     $role = Role::findByName(RoleName::User->value, 'web');
     User::factory()->withUserRole()->create();
@@ -101,7 +101,7 @@ it('forbids deleting a role that still has users', function (): void {
         ->assertForbidden();
 });
 
-it('deletes a role without users', function (): void {
+it('exclui um perfil sem usuários', function (): void {
     $admin = User::factory()->admin()->create();
     $role = Role::create(['name' => 'temp-role', 'guard_name' => 'web']);
 
@@ -112,7 +112,7 @@ it('deletes a role without users', function (): void {
     expect(Role::query()->where('name', 'temp-role')->exists())->toBeFalse();
 });
 
-it('returns the permission catalog for admins', function (): void {
+it('retorna o catálogo de permissões para administradores', function (): void {
     $admin = User::factory()->admin()->create();
 
     $this->actingAs($admin)
@@ -126,7 +126,7 @@ it('returns the permission catalog for admins', function (): void {
         ->assertJsonPath('data.1.modules.2.key', 'audit');
 });
 
-it('forbids the permission catalog without create or update permission', function (): void {
+it('proíbe o catálogo sem permissão de criar ou atualizar', function (): void {
     $user = User::factory()->withUserRole()->create();
 
     $this->actingAs($user)
@@ -134,7 +134,7 @@ it('forbids the permission catalog without create or update permission', functio
         ->assertForbidden();
 });
 
-it('filters roles by search query', function (): void {
+it('filtra perfis pela busca', function (): void {
     $admin = User::factory()->admin()->create();
 
     $this->actingAs($admin)
@@ -151,7 +151,7 @@ it('filters roles by search query', function (): void {
         ->assertJsonPath('data.0.name', 'filterable-role');
 });
 
-it('filters roles by display label', function (): void {
+it('filtra perfis pelo rótulo exibido', function (): void {
     $admin = User::factory()->admin()->create();
 
     $this->actingAs($admin)
@@ -162,7 +162,7 @@ it('filters roles by display label', function (): void {
         ->assertJsonPath('data.0.label', 'Administrador');
 });
 
-it('sorts roles by name descending', function (): void {
+it('ordena perfis por nome descendente', function (): void {
     $admin = User::factory()->admin()->create();
 
     $names = $this->actingAs($admin)
@@ -173,7 +173,7 @@ it('sorts roles by name descending', function (): void {
     expect($names)->toBe(collect($names)->sortDesc()->values()->all());
 });
 
-it('rejects invalid role sort columns', function (): void {
+it('rejeita colunas de ordenação inválidas em perfis', function (): void {
     $admin = User::factory()->admin()->create();
 
     $this->actingAs($admin)

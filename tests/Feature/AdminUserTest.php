@@ -6,11 +6,11 @@ use App\Enums\PermissionName;
 use App\Enums\RoleName;
 use App\Models\User;
 
-it('blocks guests from listing users', function (): void {
+it('bloqueia visitantes de listar usuários', function (): void {
     $this->getJson('/api/admin/users')->assertUnauthorized();
 });
 
-it('forbids listing users without permission', function (): void {
+it('proíbe listar usuários sem permissão', function (): void {
     $user = User::factory()->withUserRole()->create();
 
     $this->actingAs($user)
@@ -18,7 +18,7 @@ it('forbids listing users without permission', function (): void {
         ->assertForbidden();
 });
 
-it('lists users for an admin', function (): void {
+it('lista usuários para um administrador', function (): void {
     $admin = User::factory()->admin()->create();
     User::factory()->count(2)->create();
 
@@ -35,7 +35,7 @@ it('lists users for an admin', function (): void {
         ->assertJsonMissingPath('data.0.permissions');
 });
 
-it('includes permissions when showing a single user', function (): void {
+it('inclui permissões ao exibir um usuário', function (): void {
     $admin = User::factory()->admin()->create();
     $user = User::factory()->withUserRole()->create();
 
@@ -53,7 +53,7 @@ it('includes permissions when showing a single user', function (): void {
         ]);
 });
 
-it('paginates users with a custom per_page', function (): void {
+it('pagina usuários com per_page customizado', function (): void {
     $admin = User::factory()->admin()->create();
     User::factory()->count(10)->create();
 
@@ -64,7 +64,7 @@ it('paginates users with a custom per_page', function (): void {
         ->assertJsonPath('meta.per_page', 5);
 });
 
-it('creates a user', function (): void {
+it('cria um usuário', function (): void {
     $admin = User::factory()->admin()->create();
 
     $this->actingAs($admin)
@@ -88,7 +88,7 @@ it('creates a user', function (): void {
     expect(User::query()->where('email', 'new@spa-base.test')->first()?->hasRole(RoleName::User))->toBeTrue();
 });
 
-it('forbids creating a user without permission', function (): void {
+it('proíbe criar usuário sem permissão', function (): void {
     $user = User::factory()->withUserRole()->create();
 
     $this->actingAs($user)
@@ -102,7 +102,7 @@ it('forbids creating a user without permission', function (): void {
         ->assertForbidden();
 });
 
-it('shows a user', function (): void {
+it('exibe um usuário', function (): void {
     $admin = User::factory()->admin()->create();
     $user = User::factory()->create();
 
@@ -112,7 +112,7 @@ it('shows a user', function (): void {
         ->assertJsonPath('data.id', $user->id);
 });
 
-it('forbids showing a user without permission', function (): void {
+it('proíbe exibir usuário sem permissão', function (): void {
     $actor = User::factory()->withUserRole()->create();
     $user = User::factory()->create();
 
@@ -121,7 +121,7 @@ it('forbids showing a user without permission', function (): void {
         ->assertForbidden();
 });
 
-it('updates a user', function (): void {
+it('atualiza um usuário', function (): void {
     $admin = User::factory()->admin()->create();
     $user = User::factory()->withUserRole()->create([
         'email' => 'old@spa-base.test',
@@ -141,7 +141,7 @@ it('updates a user', function (): void {
     expect($user->fresh()?->hasRole(RoleName::Admin))->toBeTrue();
 });
 
-it('updates a user without requiring a password', function (): void {
+it('atualiza um usuário sem exigir senha', function (): void {
     $admin = User::factory()->admin()->create();
     $user = User::factory()->withUserRole()->create([
         'email' => 'keep-password@spa-base.test',
@@ -164,7 +164,7 @@ it('updates a user without requiring a password', function (): void {
     expect($user->fresh()?->password)->toBe($originalHash);
 });
 
-it('deletes another user', function (): void {
+it('exclui outro usuário', function (): void {
     $admin = User::factory()->admin()->create();
     $user = User::factory()->create();
 
@@ -177,7 +177,7 @@ it('deletes another user', function (): void {
     ]);
 });
 
-it('prevents self-deletion', function (): void {
+it('impede autoexclusão', function (): void {
     $admin = User::factory()->admin()->create();
 
     $this->actingAs($admin)
@@ -189,7 +189,7 @@ it('prevents self-deletion', function (): void {
     ]);
 });
 
-it('returns roles and permissions for the authenticated user', function (): void {
+it('retorna perfis e permissões do usuário autenticado', function (): void {
     $admin = User::factory()->admin()->create();
 
     $response = $this->actingAs($admin)
@@ -202,7 +202,7 @@ it('returns roles and permissions for the authenticated user', function (): void
     expect($permissions)->toEqualCanonicalizing(PermissionName::values());
 });
 
-it('sorts users by email descending', function (): void {
+it('ordena usuários por e-mail descendente', function (): void {
     $admin = User::factory()->admin()->create([
         'name' => 'Admin Sort',
         'email' => 'admin-sort@spa-base.test',
@@ -224,7 +224,7 @@ it('sorts users by email descending', function (): void {
     expect($emails)->toBe(collect($emails)->sortDesc()->values()->all());
 });
 
-it('filters users by search query', function (): void {
+it('filtra usuários pela busca', function (): void {
     $admin = User::factory()->admin()->create();
     User::factory()->create([
         'name' => 'Unique Filter Name',
@@ -242,7 +242,7 @@ it('filters users by search query', function (): void {
         ->assertJsonPath('data.0.email', 'unique-filter@spa-base.test');
 });
 
-it('filters users by role', function (): void {
+it('filtra usuários por perfil', function (): void {
     $admin = User::factory()->admin()->create();
     User::factory()->withUserRole()->create([
         'email' => 'only-user-role@spa-base.test',
@@ -257,7 +257,7 @@ it('filters users by role', function (): void {
         ->and($emails)->not->toContain($admin->email);
 });
 
-it('rejects invalid user sort columns', function (): void {
+it('rejeita colunas de ordenação inválidas em usuários', function (): void {
     $admin = User::factory()->admin()->create();
 
     $this->actingAs($admin)
