@@ -41,7 +41,7 @@ final class IndexUserRequest extends FormRequest
         return min(max($this->integer('per_page', 10), 1), 100);
     }
 
-    public function sortColumn(string $default = 'name'): string
+    public function sortColumn(string $default = 'id'): string
     {
         $sort = $this->validated('sort');
 

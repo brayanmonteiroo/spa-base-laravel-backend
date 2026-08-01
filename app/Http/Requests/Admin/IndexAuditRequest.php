@@ -22,7 +22,7 @@ final class IndexAuditRequest extends FormRequest
     {
         return [
             'per_page' => ['sometimes', 'integer', 'min:1', 'max:100'],
-            'sort' => ['sometimes', 'nullable', 'string', Rule::in(['created_at', 'event'])],
+            'sort' => ['sometimes', 'nullable', 'string', Rule::in(['id', 'created_at', 'event'])],
             'direction' => ['sometimes', 'nullable', 'string', Rule::in(['asc', 'desc'])],
             'event' => [
                 'sometimes',
@@ -48,7 +48,7 @@ final class IndexAuditRequest extends FormRequest
         return min(max($this->integer('per_page', 10), 1), 100);
     }
 
-    public function sortColumn(string $default = 'created_at'): string
+    public function sortColumn(string $default = 'id'): string
     {
         $sort = $this->validated('sort');
 

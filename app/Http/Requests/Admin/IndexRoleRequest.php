@@ -22,7 +22,7 @@ final class IndexRoleRequest extends FormRequest
     {
         return [
             'per_page' => ['sometimes', 'integer', 'min:1', 'max:100'],
-            'sort' => ['sometimes', 'nullable', 'string', Rule::in(['name'])],
+            'sort' => ['sometimes', 'nullable', 'string', Rule::in(['id', 'name'])],
             'direction' => ['sometimes', 'nullable', 'string', Rule::in(['asc', 'desc'])],
             'q' => ['sometimes', 'nullable', 'string', 'max:255'],
         ];
@@ -33,7 +33,7 @@ final class IndexRoleRequest extends FormRequest
         return min(max($this->integer('per_page', 10), 1), 100);
     }
 
-    public function sortColumn(string $default = 'name'): string
+    public function sortColumn(string $default = 'id'): string
     {
         $sort = $this->validated('sort');
 
