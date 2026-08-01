@@ -16,6 +16,8 @@ final class IndexRoleRequest extends FormRequest
     }
 
     /**
+     * Regras de validação.
+     *
      * @return array<string, mixed>
      */
     public function rules(): array
@@ -28,11 +30,17 @@ final class IndexRoleRequest extends FormRequest
         ];
     }
 
+    /**
+     * Limite de registros por página.
+     */
     public function perPage(): int
     {
         return min(max($this->integer('per_page', 10), 1), 100);
     }
 
+    /**
+     * Coluna de ordenação.
+     */
     public function sortColumn(string $default = 'id'): string
     {
         $sort = $this->validated('sort');
@@ -40,6 +48,9 @@ final class IndexRoleRequest extends FormRequest
         return is_string($sort) && $sort !== '' ? $sort : $default;
     }
 
+    /**
+     * Direção de ordenação.
+     */
     public function sortDirection(string $default = 'asc'): string
     {
         $direction = $this->validated('direction');

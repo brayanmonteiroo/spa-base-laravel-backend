@@ -13,6 +13,8 @@ use Illuminate\Validation\ValidationException;
 final class ForgotPasswordController extends Controller
 {
     /**
+     * Solicita redefinição de senha por e-mail.
+     *
      * @throws ValidationException
      */
     public function store(ForgotPasswordRequest $request): JsonResponse

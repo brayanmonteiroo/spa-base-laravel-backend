@@ -13,6 +13,8 @@ use Illuminate\Validation\ValidationException;
 final class LoginController extends Controller
 {
     /**
+     * Autentica um usuário.
+     *
      * @throws ValidationException
      */
     public function store(LoginRequest $request): JsonResponse

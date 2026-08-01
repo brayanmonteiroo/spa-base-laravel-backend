@@ -9,7 +9,7 @@ use App\Enums\PermissionName;
 final class PermissionCatalog
 {
     /**
-     * Sidebar-aligned sections. Section labels are organizational only.
+     * Seções alinhadas com o sidebar. As etiquetas de sección son organizativas solo.
      *
      * @return list<array{key: string, label: string, modules: list<array{key: string, label: string, permissions: list<array{name: string, label: string}>}>}>
      */
@@ -73,6 +73,8 @@ final class PermissionCatalog
     }
 
     /**
+     * Grupos planos.
+     *
      * @deprecated Use sections(); kept for callers that still expect flat groups.
      *
      * @return list<array{key: string, label: string, permissions: list<array{name: string, label: string}>}>
@@ -91,6 +93,8 @@ final class PermissionCatalog
     }
 
     /**
+     * Nomes das permissões.
+     *
      * @return list<string>
      */
     public static function permissionNames(): array

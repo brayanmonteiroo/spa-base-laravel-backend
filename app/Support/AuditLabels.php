@@ -9,6 +9,9 @@ use App\Models\User;
 
 final class AuditLabels
 {
+    /**
+     * Converte o evento em um rótulo.
+     */
     public static function eventLabel(string $event): string
     {
         return match ($event) {
@@ -22,6 +25,9 @@ final class AuditLabels
         };
     }
 
+    /**
+     * Converte o tipo em um rótulo.
+     */
     public static function auditableLabel(?string $type): string
     {
         return match ($type) {

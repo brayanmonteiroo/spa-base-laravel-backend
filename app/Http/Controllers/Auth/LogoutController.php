@@ -11,6 +11,9 @@ use Illuminate\Support\Facades\Auth;
 
 final class LogoutController extends Controller
 {
+    /**
+     * Encerra a sessão do usuário.
+     */
     public function destroy(Request $request): JsonResponse
     {
         Auth::guard('web')->logout();

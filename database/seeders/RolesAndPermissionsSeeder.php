@@ -13,6 +13,9 @@ use Spatie\Permission\PermissionRegistrar;
 
 final class RolesAndPermissionsSeeder extends Seeder
 {
+    /**
+     * Semeia os perfis e as permissões.
+     */
     public function run(): void
     {
         app()[PermissionRegistrar::class]->forgetCachedPermissions();

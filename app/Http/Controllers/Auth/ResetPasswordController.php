@@ -17,6 +17,8 @@ use Illuminate\Validation\ValidationException;
 final class ResetPasswordController extends Controller
 {
     /**
+     * Redefine a senha do usuário.
+     *
      * @throws ValidationException
      */
     public function store(ResetPasswordRequest $request): JsonResponse

@@ -17,6 +17,8 @@ final class StoreRoleRequest extends FormRequest
     }
 
     /**
+     * Regras de validação.
+     *
      * @return array<string, mixed>
      */
     public function rules(): array

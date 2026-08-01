@@ -11,6 +11,9 @@ use Illuminate\Validation\Rule;
 
 final class UpdateRoleRequest extends FormRequest
 {
+    /**
+     * Autorização.
+     */
     public function authorize(): bool
     {
         /** @var Role $role */
@@ -20,6 +23,8 @@ final class UpdateRoleRequest extends FormRequest
     }
 
     /**
+     * Regras de validação.
+     *
      * @return array<string, mixed>
      */
     public function rules(): array

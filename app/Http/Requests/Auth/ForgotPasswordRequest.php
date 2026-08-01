@@ -8,12 +8,17 @@ use Illuminate\Foundation\Http\FormRequest;
 
 final class ForgotPasswordRequest extends FormRequest
 {
+    /**
+     * Autorização.
+     */
     public function authorize(): bool
     {
         return true;
     }
 
     /**
+     * Regras de validação.
+     *
      * @return array<string, mixed>
      */
     public function rules(): array

@@ -9,12 +9,17 @@ use Illuminate\Validation\Rules\Password;
 
 final class ResetPasswordRequest extends FormRequest
 {
+    /**
+     * Autorização.
+     */
     public function authorize(): bool
     {
         return true;
     }
 
     /**
+     * Regras de validação.
+     *
      * @return array<string, mixed>
      */
     public function rules(): array

@@ -13,12 +13,17 @@ use Illuminate\Validation\ValidationException;
 
 final class LoginRequest extends FormRequest
 {
+    /**
+     * Autorização.
+     */
     public function authorize(): bool
     {
         return true;
     }
 
     /**
+     * Regras de validação.
+     *
      * @return array<string, mixed>
      */
     public function rules(): array
@@ -31,6 +36,8 @@ final class LoginRequest extends FormRequest
     }
 
     /**
+     * Autentica um usuário.
+     *
      * @throws ValidationException
      */
     public function authenticate(): void
@@ -52,6 +59,8 @@ final class LoginRequest extends FormRequest
     }
 
     /**
+     * Verifica se o usuário está limitado.
+     *
      * @throws ValidationException
      */
     public function ensureIsNotRateLimited(): void
@@ -72,6 +81,9 @@ final class LoginRequest extends FormRequest
         ]);
     }
 
+    /**
+     * Chave de limitação de taxa.
+     */
     public function throttleKey(): string
     {
         return Str::transliterate(

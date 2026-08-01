@@ -23,6 +23,9 @@ use Illuminate\Validation\ValidationException;
 
 final class RoleController extends Controller
 {
+    /**
+     * Lista perfis paginados.
+     */
     public function index(IndexRoleRequest $request): AnonymousResourceCollection
     {
         $search = $request->validated('q');

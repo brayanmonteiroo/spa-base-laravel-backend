@@ -11,6 +11,9 @@ use Illuminate\Validation\Rules\Password;
 
 final class UpdateUserRequest extends FormRequest
 {
+    /**
+     * Autorização.
+     */
     public function authorize(): bool
     {
         /** @var User $user */
@@ -19,6 +22,9 @@ final class UpdateUserRequest extends FormRequest
         return $this->user()?->can('update', $user) ?? false;
     }
 
+    /**
+     * Prepara a validação.
+     */
     protected function prepareForValidation(): void
     {
         if (blank($this->input('password'))) {
