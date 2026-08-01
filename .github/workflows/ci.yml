@@ -32,7 +32,6 @@ jobs:
 
     env:
       APP_ENV: testing
-      APP_KEY: base64:G1vOwOFpt4ZjH56dLuJzN+zR9XLxEffT+PF2ZcA5Zkc=
       DB_CONNECTION: pgsql
       DB_HOST: 127.0.0.1
       DB_PORT: 5432
@@ -49,9 +48,12 @@ jobs:
       - name: Setup PHP
         uses: shivammathur/setup-php@v2
         with:
-          php-version: "8.3"
+          php-version: "8.5"
           extensions: mbstring, bcmath, pdo_pgsql, pgsql, tokenizer, xml, ctype, json, fileinfo, openssl
           coverage: none
+
+      - name: Generate APP_KEY
+        run: echo "APP_KEY=base64:$(openssl rand -base64 32)" >> "$GITHUB_ENV"
 
       - name: Install Composer dependencies
         run: composer install --prefer-dist --no-interaction --no-progress
