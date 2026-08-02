@@ -51,7 +51,9 @@ final class RoleController extends Controller
 
         return RoleResource::collection($roles);
     }
-
+    /**
+     * Cria um novo perfil.
+     */
     public function store(StoreRoleRequest $request): JsonResponse
     {
         $data = $request->validated();
@@ -68,6 +70,9 @@ final class RoleController extends Controller
             ->setStatusCode(201);
     }
 
+    /**
+     * Exibe detalhes de um perfil específico.
+     */
     public function show(Role $role): RoleResource
     {
         $this->authorize('view', $role);
@@ -75,6 +80,9 @@ final class RoleController extends Controller
         return new RoleResource($this->presentRole($role));
     }
 
+    /**
+     * Atualiza um perfil existente.
+     */
     public function update(UpdateRoleRequest $request, Role $role): RoleResource
     {
         $data = $request->validated();
@@ -88,6 +96,9 @@ final class RoleController extends Controller
         return new RoleResource($this->presentRole($role->refresh()));
     }
 
+    /**
+     * Exclui um perfil existente.
+     */
     public function destroy(Role $role): Response
     {
         $this->authorize('delete', $role);
@@ -109,6 +120,9 @@ final class RoleController extends Controller
         return response()->noContent();
     }
 
+    /**
+     * Lista de permissões.
+     */
     public function catalog(Request $request): JsonResponse
     {
         $user = $request->user();
@@ -126,6 +140,9 @@ final class RoleController extends Controller
         ]);
     }
 
+    /**
+     * Apresenta um perfil.
+     */
     private function presentRole(Role $role): Role
     {
         $role->load('permissions');
