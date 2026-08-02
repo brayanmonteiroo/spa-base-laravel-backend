@@ -51,6 +51,7 @@ final class RoleController extends Controller
 
         return RoleResource::collection($roles);
     }
+
     /**
      * Cria um novo perfil.
      */
